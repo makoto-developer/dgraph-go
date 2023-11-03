@@ -1,0 +1,17 @@
+type Tweet {
+    id: ID!
+    content: String! @search(by: [fulltext])
+    user: User!
+    public: Boolean!
+    like: [User]
+    retweet: [String!]
+    repost: [String!]
+}
+
+type User {
+    name: String! @id
+    title: String!
+    tweets: [Tweet] @hasInverse(field: user)
+    follow: [String!]
+}
+
