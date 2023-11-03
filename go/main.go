@@ -31,34 +31,41 @@ type User struct {
 }
 
 func main() {
+	ctx := context.Background()
 	dc, cancel := getDgraphClient()
 	defer cancel()
 
-	ctx := context.Background()
-	u := User{
+	user := User{
 		Uid:     "_:m",
-		Name:    "yuugi mutoh",
+		Name:    "yugi mutoh",
 		Description:     "I am the king of duelist.",
-		Tweets: []Tweet{{
-			Content: "Duel!!!",
-			Public: true,
-			Like: []User{},
-			DType:   []string{"Tweet"},
-		}},
+		Tweets: []Tweet{
+			{
+				Content: "Duel!!!",
+				Public: true,
+				Like: []User{},
+				DType: []string{"Tweet"},
+			},
+		},
 		Follow: []User{},
-		DType:   []string{"User"},
+		DType: []string{"User"},
 	}
+	addUser(ctx, dc, user)
+	log.Println("finish!")
+}
 
-	mu := &api.Mutation{
+func addUser(ctx context.Context, dc *dgo.Dgraph, user User) {
+
+	mutation := &api.Mutation{
 		CommitNow: true,
 	}
-	pb, err := json.Marshal(u)
+	pb, err := json.Marshal(user)
 	if err != nil {
 		log.Fatal(err)
 	}
 
-	mu.SetJson = pb
-	response, err := dc.NewTxn().Mutate(ctx, mu)
+	mutation.SetJson = pb
+	response, err := dc.NewTxn().Mutate(ctx, mutation)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -79,3 +86,4 @@ func getDgraphClient() (*dgo.Dgraph, CancelFunc) {
 		}
 	}
 }
+
