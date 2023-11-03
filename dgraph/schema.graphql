@@ -3,15 +3,13 @@ type Tweet {
     content: String! @search(by: [fulltext])
     user: User!
     public: Boolean!
-    like: [User]
-    retweet: [String!]
-    repost: [String!]
+    like: [User!]
 }
 
 type User {
     name: String! @id
-    title: String!
+    description: String! @search
     tweets: [Tweet] @hasInverse(field: user)
-    follow: [String!]
+    follow: [User!]
 }
 
