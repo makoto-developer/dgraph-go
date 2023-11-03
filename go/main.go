@@ -2,42 +2,67 @@ package main
 
 import (
 	"context"
+	"encoding/json"
 	"log"
 
-	"github.com/dgraph-io/dgo/v200"
-	"github.com/dgraph-io/dgo/v200/protos/api"
+	"github.com/dgraph-io/dgo/v230"
+	"github.com/dgraph-io/dgo/v230/protos/api"
 	"google.golang.org/grpc"
 )
 
 type CancelFunc func()
+
+type Tweet struct {
+	Uid     string     	`json:"uid,omitempty"`
+	Content	string     	`json:"Tweet.content,omitempty"`
+	User 	User		`json:"Tweet.user,omitempty"`
+	Public  bool		`json:"Tweet.public,omitempty"`
+	Like    []User		`json:"Tweet.like,omitempty"`
+	DType   []string	`json:"dgraph.type,omitempty"`
+}
+
+type User struct {
+	Uid			string     	`json:"User.uid,omitempty"`
+	Name    	string     	`json:"User.name,omitempty"`
+	Description string     	`json:"User.description,omitempty"`
+	Tweets		[]Tweet 	`json:"User.tweets,omitempty"`
+	Follow		[]User		`json:"User.follow,iomitempty"`
+	DType   	[]string   	`json:"dgraph.type,omitempty"`
+}
 
 func main() {
 	dc, cancel := getDgraphClient()
 	defer cancel()
 
 	ctx := context.Background()
-	op := &api.Operation{Schema: `
-		Tweet.content: string .
-	Tweet.content: string @index(fulltext) .
-	Tweet.title: string .
-	Tweet.user: uid .
-	User.age: int @index(int) .
-	User.name: string @index(hash) @upsert .
-	User.tweets: [uid] .
-	type Tweet {
-		Tweet.title
-		Tweet.content
-		Tweet.user
+	u := User{
+		Uid:     "_:m",
+		Name:    "yuugi mutoh",
+		Description:     "I am the king of duelist.",
+		Tweets: []Tweet{{
+			Content: "Duel!!!",
+			Public: true,
+			Like: []User{},
+			DType:   []string{"Tweet"},
+		}},
+		Follow: []User{},
+		DType:   []string{"User"},
 	}
-	type User {
-		User.name
-		User.age
-		User.tweets
-	}`,}
-	err := dc.Alter(ctx, op)
+
+	mu := &api.Mutation{
+		CommitNow: true,
+	}
+	pb, err := json.Marshal(u)
 	if err != nil {
 		log.Fatal(err)
 	}
+
+	mu.SetJson = pb
+	response, err := dc.NewTxn().Mutate(ctx, mu)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Println(response)
 }
 
 func getDgraphClient() (*dgo.Dgraph, CancelFunc) {
@@ -54,4 +79,3 @@ func getDgraphClient() (*dgo.Dgraph, CancelFunc) {
 		}
 	}
 }
-

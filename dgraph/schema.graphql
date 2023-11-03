@@ -7,9 +7,10 @@ type Tweet {
 }
 
 type User {
+    id: ID!
     name: String! @id
     description: String! @search
-    tweets: [Tweet] @hasInverse(field: user)
+    tweets: [Tweet!] @hasInverse(field: user)
     follow: [User!]
 }
 
