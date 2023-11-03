@@ -17,7 +17,7 @@ services:
       - ${DGRAPH_PORT_PUBLIC}:8080
       - ${DGRAPH_PORT_GRPC_PUBLIC}:9080
     restart: on-failure
-    command: dgraph alpha --my=alpha:${DGRAPH_PORT_GRPC_PRIVATE} --zero=zero:${DGRAPH_PORT_GRPC}
+    command: dgraph alpha --my=alpha:${DGRAPH_PORT_GRPC_PRIVATE} --zero=zero:${DGRAPH_PORT_GRPC}  --security "whitelist=0.0.0.0/0"
   ratel:
     image: dgraph/ratel:${DGRAPH_RETEL_VERSION}
     ports:
