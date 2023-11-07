@@ -1,7 +1,7 @@
 version: "3.8"
 services:
   zero:
-    image: dgraph/dgraph:${DGRAPH_VERSION}
+    image: dgraph/dgraph:v23.1.0
     volumes:
       - /tmp/data:/dgraph
     ports:
@@ -10,16 +10,16 @@ services:
     restart: on-failure
     command: dgraph zero --my=zero:${DGRAPH_PORT_GRPC}
   alpha:
-    image: dgraph/dgraph:${DGRAPH_VERSION}
+    image: dgraph/dgraph:v23.1.0
     volumes:
       - /tmp/data:/dgraph
     ports:
       - ${DGRAPH_PORT_PUBLIC}:8080
       - ${DGRAPH_PORT_GRPC_PUBLIC}:9080
     restart: on-failure
-    command: dgraph alpha --my=alpha:${DGRAPH_PORT_GRPC_PRIVATE} --zero=zero:${DGRAPH_PORT_GRPC}  --security "whitelist=0.0.0.0/0"
+    command: dgraph alpha --my=alpha:${DGRAPH_PORT_GRPC_PRIVATE} --zero=zero:${DGRAPH_PORT_GRPC}  --security "whitelist=${DGRAPH_ALPHA_WHITELIST}"
   ratel:
-    image: dgraph/ratel:${DGRAPH_RETEL_VERSION}
+    image: dgraph/ratel:v21.12.0
     ports:
       - ${DGRAPH_PORT_RETEL}:8000
 
