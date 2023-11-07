@@ -1,5 +1,9 @@
 # Dgraph
 
+This docker-compose.yml get from below template.
+
+https://github.com/makoto-developer/docker-templates/tree/main/dgraph
+
 ## Starting
 
 Create .env file, and edit dgraph docker container ports.
@@ -26,12 +30,4 @@ Compose starting
 ```shell
 docker compose start
 ```
-
-## Ports
-
-<<TODO Portの説明を書く>>
-
-## References
-
-- xxxx
 
